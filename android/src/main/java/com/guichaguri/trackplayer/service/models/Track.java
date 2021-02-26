@@ -7,12 +7,16 @@ import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat.QueueItem;
+
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+//import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.sigma.player.HlsMediaSource;
+//import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.upstream.*;
@@ -211,31 +215,16 @@ public class Track {
 
         switch(type) {
             case DASH:
-                return createDashSource(ds);
-            case HLS:
-                return createHlsSource(ds);
-            case SMOOTH_STREAMING:
-                return createSsSource(ds);
-            default:
-                return new ProgressiveMediaSource.Factory(ds, new DefaultExtractorsFactory()
-                        .setConstantBitrateSeekingEnabled(true))
+                return new DashMediaSource.Factory(new DefaultDashChunkSource.Factory(ds), ds)
                         .createMediaSource(uri);
+            case HLS:
+                return new HlsMediaSource.Factory(ds)
+                        .createMediaSource(uri);
+            case SMOOTH_STREAMING:
+                return new SsMediaSource.Factory(new DefaultSsChunkSource.Factory(ds), ds)
+                        .createMediaSource(uri);
+            default:
+            return new ExtractorMediaSource.Factory(ds).createMediaSource(uri);
         }
     }
-
-    private MediaSource createDashSource(DataSource.Factory factory) {
-        return new DashMediaSource.Factory(new DefaultDashChunkSource.Factory(factory), factory)
-                .createMediaSource(uri);
-    }
-
-    private MediaSource createHlsSource(DataSource.Factory factory) {
-        return new HlsMediaSource.Factory(factory)
-                .createMediaSource(uri);
-    }
-
-    private MediaSource createSsSource(DataSource.Factory factory) {
-        return new SsMediaSource.Factory(new DefaultSsChunkSource.Factory(factory), factory)
-                .createMediaSource(uri);
-    }
-
 }

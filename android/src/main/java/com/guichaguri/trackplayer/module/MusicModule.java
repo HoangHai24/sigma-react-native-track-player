@@ -160,9 +160,6 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void destroy() {
-        // Ignore if it was already destroyed
-        if (binder == null && !connecting) return;
-
         try {
             if(binder != null) {
                 binder.destroy();
@@ -456,10 +453,6 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void getState(final Promise callback) {
-        if (binder == null) {
-            callback.resolve(PlaybackStateCompat.STATE_NONE);
-        } else {
-            waitForConnection(() -> callback.resolve(binder.getPlayback().getState()));
-        }
+        waitForConnection(() -> callback.resolve(binder.getPlayback().getState()));
     }
 }

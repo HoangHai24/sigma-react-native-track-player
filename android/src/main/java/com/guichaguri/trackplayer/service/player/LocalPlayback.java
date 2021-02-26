@@ -7,8 +7,8 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.database.DatabaseProvider;
-import com.google.android.exoplayer2.database.ExoDatabaseProvider;
+//import com.google.android.exoplayer2.database.DatabaseProvider;
+//import com.google.android.exoplayer2.database.ExoDatabaseProvider;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -43,13 +43,13 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
     @Override
     public void initialize() {
-        if(cacheMaxSize > 0) {
-            File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
-            DatabaseProvider db = new ExoDatabaseProvider(context);
-            cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize), db);
-        } else {
+//        if(cacheMaxSize > 0) {
+//            File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
+//            DatabaseProvider db = new ExoDatabaseProvider(context);
+//            cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize), db);
+//        } else {
             cache = null;
-        }
+//        }
 
         super.initialize();
 
@@ -116,11 +116,6 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
                 source.removeMediaSource(index, manager.getHandler(), Utils.toRunnable(promise));
             } else {
                 source.removeMediaSource(index);
-            }
-
-            // Fix the window index
-            if (index < lastKnownWindow) {
-                lastKnownWindow--;
             }
         }
     }

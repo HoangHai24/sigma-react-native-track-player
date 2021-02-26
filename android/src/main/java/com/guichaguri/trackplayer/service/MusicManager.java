@@ -127,9 +127,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
                 .setBackBuffer(backBuffer, false)
                 .createDefaultLoadControl();
 
-        SimpleExoPlayer player = new SimpleExoPlayer.Builder(service)
-                .setLoadControl(control)
-                .build();
+        SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(service, new DefaultRenderersFactory(service), new DefaultTrackSelector(), control);
 
         player.setAudioAttributes(new com.google.android.exoplayer2.audio.AudioAttributes.Builder()
                 .setContentType(C.CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build());
@@ -149,8 +147,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
             requestFocus();
 
             if(!receivingNoisyEvents) {
-                receivingNoisyEvents = true;
                 service.registerReceiver(noisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+                receivingNoisyEvents = true;
             }
 
             if(!wakeLock.isHeld()) wakeLock.acquire();
@@ -182,12 +180,6 @@ public class MusicManager implements OnAudioFocusChangeListener {
     public void onStop() {
         Log.d(Utils.LOG, "onStop");
 
-        // Unregisters the noisy receiver
-        if(receivingNoisyEvents) {
-            service.unregisterReceiver(noisyReceiver);
-            receivingNoisyEvents = false;
-        }
-
         // Release the wake and the wifi locks
         if(wakeLock.isHeld()) wakeLock.release();
         if(wifiLock.isHeld()) wifiLock.release();
@@ -209,7 +201,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     public void onTrackUpdate(Track previous, long prevPos, Track next) {
         Log.d(Utils.LOG, "onTrackUpdate");
 
-        if(next != null) metadata.updateMetadata(playback, next);
+        if(next != null) metadata.updateMetadata(next);
 
         Bundle bundle = new Bundle();
         bundle.putString("track", previous != null ? previous.id : null);
